@@ -24,7 +24,7 @@ public:
     double initial_pA;
     double initial_IA;
 
-    parameters(char ** argv)
+    parameters()
     {
         parseInput();
     }
@@ -287,7 +287,7 @@ int main(int argc, char ** argv)
 {
     if (argc >= 2)
     {
-        parameters Parameters(argv);
+        parameters Parameters;
         Parameters.display();
         randBin RandBin(Parameters.n);
 
