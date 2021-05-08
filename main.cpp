@@ -110,6 +110,32 @@ void cleanHistogramFile(parameters params)
     file.close();
 }
 
+ofstream createAndOpenFileKwadraty(parameters* params)
+{
+    ofstream file;
+    string name = "KWA__M" + to_string(params->M) + "_n" + to_string(params->n) + "_g" + to_string(params->g) + "_s" +
+        to_string(params->s) + "_IA" + toStringWithPrecision(params->IA, 1) + "_pA" + toStringWithPrecision(params->pA, 1) +
+        "_IB" + toStringWithPrecision(params->IB, 1) + "_pB" + toStringWithPrecision(params->pB, 1) +
+        "_numOfKw" + to_string(params->numOfKwadraciki)  + ".txt";
+    
+    file.open(name, ios::out | ios::app);
+
+    return file;
+}
+
+void cleanKwadratyFile(parameters params)
+{
+    ofstream file;
+    string name = "KWA__M" + to_string(params.M) + "_n" + to_string(params.n) + "_g" + to_string(params.g) + "_s" +
+        to_string(params.s) + "_IA" + toStringWithPrecision(params.IA, 1) + "_pA" + toStringWithPrecision(params.pA, 1) +
+        "_IB" + toStringWithPrecision(params.IB, 1) + "_pB" + toStringWithPrecision(params.pB, 1) +
+        "_numOfKw" + to_string(params.numOfKwadraciki)  + ".txt";
+
+    file.open(name, ios::out);
+    file << "pA    IA    proportion\n";
+    file.close();
+}
+
 class agents
 {
 public:
@@ -180,7 +206,6 @@ public:
         for (auto v : tableOfAgents)
             writeToFileHistogram(Parameters, v);
     }
-
     double countProportionOfBToAll()
     {
         double proportion;
@@ -191,7 +216,8 @@ public:
             countB += (agent < 0) ? 1 : 0;
         }
 
-        return (double) countB / Parameters->n;
+        proportion = (double) countB / Parameters->n;
+        return proportion;
     }
 };
 
@@ -200,13 +226,11 @@ class kwadrats
 public:
     randBin *RandBin;
     parameters* Parameters;
-    // double table[Parameters->numOfKwadraciki][Parameters->numOfKwadraciki];
-    // double table[20][20];
     const int tableDim = Parameters->numOfKwadraciki;
     vector<vector<double>> table;
-    // array<array<double, tableDim>, tableDim> table;
     void liczKwadraciki()
     {
+        auto file = createAndOpenFileKwadraty(Parameters);
         table.resize(tableDim, vector<double>(tableDim));
         for(int i = 0; i < tableDim; i++)
         {
@@ -219,13 +243,14 @@ public:
                     Agents.interactions();
                 }
                 table[i][j] = Agents.countProportionOfBToAll();
-                cout<< "pA = " << Parameters->pA <<  "   IA = " << Parameters->IA << "   prop = " << table[i][j] <<endl;
+                // cout<< "pA = " << Parameters->pA <<  "   IA = " << Parameters->IA << "   prop = " << table[i][j] <<endl;
+                file << toStringWithPrecision(Parameters->pA, 2) << "  " << toStringWithPrecision(Parameters->IA, 2) << "  " <<
+                    toStringWithPrecision(table[i][j], 2) << "\n";
                 Parameters->pA += 0.01;
             }
             Parameters->IA += 0.05;
-            
         }
-
+        file.close();
     }
     kwadrats(parameters* _Parameters, randBin * _RandBin)
     :RandBin(_RandBin), Parameters(_Parameters)
@@ -241,12 +266,11 @@ public:
             cout<<endl;
         }
     }
-
 };
 
 int main(int argc, char ** argv)
 {
-    if (argc >= 1)
+    if (argc >= 2)
     {
         parameters Parameters(argv);
         Parameters.display();
@@ -264,9 +288,10 @@ int main(int argc, char ** argv)
         }
         else if (simulationType == "kwadraty")
         {
+            cleanKwadratyFile(Parameters);
             kwadrats Kwadrats(&Parameters, &RandBin);
             Kwadrats.liczKwadraciki();
-            Kwadrats.display();
+            // Kwadrats.display();
         }
         else 
         {

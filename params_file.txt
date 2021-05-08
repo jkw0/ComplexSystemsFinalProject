@@ -1,2 +1,2 @@
-1 10 5 3 0.1 0.3 0.0 1 21
-M n  g s IA   pA  IB selfInf numOfKw
+1 10000 50000 3 0.1 0.3 0.0 1 21
+M n  g         s IA  pA  IB selfInf numOfKw
