@@ -21,6 +21,8 @@ public:
     double pB; // proportion of supporters of B
     bool selfInfluenceMatters = 1;
     int numOfKwadraciki;
+    double initial_pA;
+    double initial_IA;
 
     parameters(char ** argv)
     {
@@ -57,6 +59,8 @@ public:
         selfInfluenceMatters = (stoi(selfInfluenceMatters_) == 0) ? false : true;
         numOfKwadraciki = stoi(numOfKwadraciki_);
         pB = 1 - pA;
+        initial_pA = pA;
+        initial_IA = IA;
     }
 };
 
@@ -114,9 +118,9 @@ ofstream createAndOpenFileKwadraty(parameters* params)
 {
     ofstream file;
     string name = "KWA__M" + to_string(params->M) + "_n" + to_string(params->n) + "_g" + to_string(params->g) + "_s" +
-        to_string(params->s) + "_IA" + toStringWithPrecision(params->IA, 1) + "_pA" + toStringWithPrecision(params->pA, 1) +
-        "_IB" + toStringWithPrecision(params->IB, 1) + "_pB" + toStringWithPrecision(params->pB, 1) +
-        "_numOfKw" + to_string(params->numOfKwadraciki)  + ".txt";
+        to_string(params->s) + "_IA" + toStringWithPrecision(params->initial_IA, 1) + "_pA" +
+        toStringWithPrecision(params->initial_pA, 1) + "_IB" + toStringWithPrecision(params->IB, 1) + "_pB" +
+        toStringWithPrecision(params->pB, 1) + "_numOfKw" + to_string(params->numOfKwadraciki)  + ".txt";
     
     file.open(name, ios::out | ios::app);
 
@@ -127,12 +131,11 @@ void cleanKwadratyFile(parameters params)
 {
     ofstream file;
     string name = "KWA__M" + to_string(params.M) + "_n" + to_string(params.n) + "_g" + to_string(params.g) + "_s" +
-        to_string(params.s) + "_IA" + toStringWithPrecision(params.IA, 1) + "_pA" + toStringWithPrecision(params.pA, 1) +
-        "_IB" + toStringWithPrecision(params.IB, 1) + "_pB" + toStringWithPrecision(params.pB, 1) +
-        "_numOfKw" + to_string(params.numOfKwadraciki)  + ".txt";
+        to_string(params.s) + "_IA" + toStringWithPrecision(params.initial_IA, 1) + "_pA" +
+        toStringWithPrecision(params.initial_pA, 1) + "_IB" + toStringWithPrecision(params.IB, 1) + "_pB" +
+        toStringWithPrecision(params.pB, 1) + "_numOfKw" + to_string(params.numOfKwadraciki)  + ".txt";
 
     file.open(name, ios::out);
-    file << "pA    IA    proportion\n";
     file.close();
 }
 
@@ -238,7 +241,7 @@ public:
     vector<vector<double>> table;
     void liczKwadraciki()
     {
-        auto file = createAndOpenFileKwadraty(Parameters);
+        // auto file = createAndOpenFileKwadraty(Parameters);
         table.resize(tableDim, vector<double>(tableDim));
         for(int i = 0; i < tableDim; i++)
         {
@@ -252,27 +255,31 @@ public:
                 }
                 table[i][j] = Agents.countProportionOfBToAll();
                 // cout<< "pA = " << Parameters->pA <<  "   IA = " << Parameters->IA << "   prop = " << table[i][j] <<endl;
-                file << toStringWithPrecision(Parameters->pA, 2) << "  " << toStringWithPrecision(Parameters->IA, 2) << "  " <<
-                    toStringWithPrecision(table[i][j], 2) << "\n";
+                // file << toStringWithPrecision(Parameters->pA, 2) << "  " << toStringWithPrecision(Parameters->IA, 2) << "  " <<
+                    // toStringWithPrecision(table[i][j], 2) << "\n";
                 Parameters->pA += 0.01;
             }
             Parameters->IA += 0.05;
         }
-        file.close();
+        // file.close();
     }
     kwadrats(parameters* _Parameters, randBin * _RandBin)
     :RandBin(_RandBin), Parameters(_Parameters)
     {}
     void display()
     {
+        auto file = createAndOpenFileKwadraty(Parameters);
         for(int i = 0; i < 20; i++)
         {
             for(int j = 0; j < 20; j++)
             {
                 cout<< table[i][j] << "\t";
+                file << toStringWithPrecision(table[i][j], 4) << "\t";
             }
             cout<<endl;
+            file << "\n";
         }
+        file.close();
     }
 };
 
@@ -299,7 +306,7 @@ int main(int argc, char ** argv)
             cleanKwadratyFile(Parameters);
             kwadrats Kwadrats(&Parameters, &RandBin);
             Kwadrats.liczKwadraciki();
-            // Kwadrats.display();
+            Kwadrats.display();
         }
         else 
         {
