@@ -26,6 +26,4 @@ wyniki działania symulacji "histogram":
 
 wyniki działania symulacji "kwadraty":
 - plik o nazwie z parametrami
-- trzy kolumny pA, IA, proportion, gdzie
-    - pA i IA zmieniają się tak jak sugeruje siatka z artykule
-    - proportion to wynik oznaczający proporcję zwolenników B do wszytkich
+- tablica z danymi do heatmapy
