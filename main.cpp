@@ -12,26 +12,20 @@ using namespace std;
 class parameters
 {
 public:
-    int M;
-    int n;
-    int g;
-    int s;
-    double IA;
-    double pA;
-    double IB;
-    double pB;
+    int M; // max number of interaction in a discussion group
+    int n; // number of agents in the whole system
+    int g; // number of all discussion groups formed in a single simulation
+    int s; // size of one discussion group
+    double IA; // proportion of inflexibles among supporters of A
+    double pA; // proportion of supporters of A
+    double IB; // proportion of inflexibles among supporters of B
+    double pB; // proportion of supporters of B
+    bool selfInfluenceMatters = 1;
+    int numOfKwadraciki;
 
     parameters(char ** argv)
     {
-        int i = 1;
-        M = stoi(argv[i++]);
-        n = stoi(argv[i++]);
-        g = stoi(argv[i++]);
-        s = stoi(argv[i++]);
-        IA = stod(argv[i++]);
-        pA = stod(argv[i++]);
-        IB = stod(argv[i++]);
-        pB = 1 - pA;
+        parseInput();
     };
 
     void display()
@@ -43,7 +37,27 @@ public:
              << "IA = "<< IA << endl
              << "pA = "<< pA << endl
              << "IB = "<< IB << endl
-             << "pB = "<< pB << endl << endl;
+             << "pB = "<< pB << endl
+             << "selfInfluenceMatters = " << selfInfluenceMatters << endl
+             << "numOfKwadraciki = " << numOfKwadraciki << endl << endl;
+    }
+
+    void parseInput()
+    {
+        ifstream file;
+        file.open("params_file.txt", ifstream::in);
+        string M_, n_, g_, s_, IA_, pA_, IB_, selfInfluenceMatters_, numOfKwadraciki_;
+        file >> M_ >> n_ >> g_ >> s_ >> IA_ >> pA_ >> IB_ >> selfInfluenceMatters_ >> numOfKwadraciki_;
+        M = stoi(M_);
+        n = stoi(n_);
+        g = stoi(g_);
+        s = stoi(s_);
+        IA = stod(IA_);
+        pA = stod(pA_);
+        IB = stod(IB_);
+        selfInfluenceMatters = (stoi(selfInfluenceMatters_) == 0) ? false : true;
+        numOfKwadraciki = stoi(numOfKwadraciki_);
+        pB = 1 - pA;
     }
 };
 
@@ -64,22 +78,37 @@ public:
     randBin(const randBin&) = delete;
 };
 
-string toStringWithPrecision(const double value)
+string toStringWithPrecision(const double value, int prec)
 {
     ostringstream out;
-    out.precision(1);
+    out.precision(prec);
     out << fixed << value;
     return out.str();
 }
 
-void writeToFile(parameters* params, double val)
+void writeToFileHistogram(parameters* params, double val)
 {
     ofstream file;
-    string name = "M" + to_string(params->M) + "_n" + to_string(params->n) + "_g" + to_string(params->g) + "_s" + to_string(params->s) + "_IA" + toStringWithPrecision(params->IA) + "_pA" +
-        toStringWithPrecision(params->pA) + "_IB" + toStringWithPrecision(params->IB) + "_pB" + toStringWithPrecision(params->pB) + ".txt";
+    string name = "HIS__M" + to_string(params->M) + "_n" + to_string(params->n) + "_g" + to_string(params->g) + "_s" +
+        to_string(params->s) + "_IA" + toStringWithPrecision(params->IA, 1) + "_pA" + toStringWithPrecision(params->pA, 1) +
+        "_IB" + toStringWithPrecision(params->IB, 1) + "_pB" + toStringWithPrecision(params->pB, 1) +
+        "_selfInfl" + (params->selfInfluenceMatters ? "true" : "false") + ".txt";
+
     file.open(name, ios::out | ios::app);
     file << val << "\n";
 
+    file.close();
+}
+
+void cleanHistogramFile(parameters params)
+{
+    ofstream file;
+    string name = "HIS__M" + to_string(params.M) + "_n" + to_string(params.n) + "_g" + to_string(params.g) + "_s" +
+        to_string(params.s) + "_IA" + toStringWithPrecision(params.IA, 1) + "_pA" + toStringWithPrecision(params.pA, 1) +
+        "_IB" + toStringWithPrecision(params.IB, 1) + "_pB" + toStringWithPrecision(params.pB, 1) +
+        "_selfInfl" + (params.selfInfluenceMatters ? "true" : "false") + ".txt";
+
+    file.open(name, ios::out);
     file.close();
 }
 
@@ -148,7 +177,7 @@ public:
         for (auto v : tableOfAgents)
         {
             cout << v << endl;
-            writeToFile(Parameters, v);
+            writeToFileHistogram(Parameters, v);
         }
     };
 
@@ -159,7 +188,7 @@ public:
 
         for(auto agent : tableOfAgents)
         {
-            countB += (agent > 0) ? 1 : 0;
+            countB += (agent < 0) ? 1 : 0;
         }
 
         return (double) countB / Parameters->n;
@@ -180,13 +209,13 @@ public:
             Parameters->pA = 0.3;
             for(int j = 0; j < 20; j++)
             {
-                cout<< "pA = " << Parameters->pA <<  "\t IA = " << Parameters->IA <<endl;
                 agents Agents(Parameters, RandBin);
                 for(int i = 0; i < Parameters->g; i++)
                 {
                     Agents.interactions();
                 }
                 table[i][j] = Agents.countProportionOfBToAll();
+                cout<< "pA = " << Parameters->pA <<  "   IA = " << Parameters->IA << "   prop = " << table[i][j] <<endl;
                 Parameters->pA += 0.01;
             }
             Parameters->IA += 0.05;
@@ -227,7 +256,7 @@ int main(int argc, char ** argv)
 
     kwadrats Kwadrats(&Parameters, &RandBin);
     Kwadrats.liczKwadraciki();
-    Kwadrats.display();
+    // Kwadrats.display();
 
     return 0;
 }
