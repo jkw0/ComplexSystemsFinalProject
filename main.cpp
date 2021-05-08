@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <fstream>
 #include <sstream>
-
+#include <array>
 using namespace std;
 
 class parameters
@@ -199,14 +199,19 @@ class kwadrats
 {
 public:
     randBin *RandBin;
-    double table[20][20];
     parameters* Parameters;
+    // double table[Parameters->numOfKwadraciki][Parameters->numOfKwadraciki];
+    // double table[20][20];
+    const int tableDim = Parameters->numOfKwadraciki;
+    vector<vector<double>> table;
+    // array<array<double, tableDim>, tableDim> table;
     void liczKwadraciki()
     {
-        for(int i = 0; i < 20; i++)
+        table.resize(tableDim, vector<double>(tableDim));
+        for(int i = 0; i < tableDim; i++)
         {
             Parameters->pA = 0.3;
-            for(int j = 0; j < 20; j++)
+            for(int j = 0; j < tableDim; j++)
             {
                 agents Agents(Parameters, RandBin);
                 for(int i = 0; i < Parameters->g; i++)
@@ -261,7 +266,7 @@ int main(int argc, char ** argv)
         {
             kwadrats Kwadrats(&Parameters, &RandBin);
             Kwadrats.liczKwadraciki();
-            // Kwadrats.display();
+            Kwadrats.display();
         }
         else 
         {
