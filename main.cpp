@@ -69,7 +69,6 @@ public:
     : max_nr(_max_nr)
     {
         std::srand(std::time(nullptr));
-        cout<<"Robie srand() "<<endl;
     };
     int genRandBinNumber()
     {
@@ -242,21 +241,38 @@ public:
 
 int main(int argc, char ** argv)
 {
-    parameters Parameters (argv);
-    Parameters.display();
+    if (argc >= 1)
+    {
+        parameters Parameters(argv);
+        Parameters.display();
+        randBin RandBin(Parameters.n);
 
-    randBin RandBin(Parameters.n);
-    // agents Agents(&Parameters, &RandBin);
-    // for(int i = 0; i < Parameters.g; i++)
-    // {
-    //     Agents.interactions();
-    // }
-        
-    // Agents.display();
+        string simulationType = argv[1];
+        if (simulationType == "histogram")
+        {
+            agents Agents(&Parameters, &RandBin);
+            for(int i = 0; i < Parameters.g; i++)
+                Agents.interactions();
 
-    kwadrats Kwadrats(&Parameters, &RandBin);
-    Kwadrats.liczKwadraciki();
-    // Kwadrats.display();
+            Agents.display();
+        }
+        else if (simulationType == "kwadraty")
+        {
+            kwadrats Kwadrats(&Parameters, &RandBin);
+            Kwadrats.liczKwadraciki();
+            // Kwadrats.display();
+        }
+        else 
+        {
+            cout << "niepoprawny typ symulacji: histogram lub kwadraty" << endl;
+            exit(0);
+        }
+    }
+    else
+    {
+        cout << "podaj typ symulacji: histogram lub kwadraty" << endl;
+        exit(0);
+    }
 
     return 0;
 }
