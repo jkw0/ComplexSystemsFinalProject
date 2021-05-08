@@ -8,7 +8,6 @@
 
 using namespace std;
 
-
 class parameters
 {
 public:
@@ -26,7 +25,7 @@ public:
     parameters(char ** argv)
     {
         parseInput();
-    };
+    }
 
     void display()
     {
@@ -69,11 +68,11 @@ public:
     : max_nr(_max_nr)
     {
         std::srand(std::time(nullptr));
-    };
+    }
     int genRandBinNumber()
     {
         return rand()%max_nr;
-    };
+    }
     randBin(const randBin&) = delete;
 };
 
@@ -139,9 +138,7 @@ public:
             tableOfAgents.push_back(-0.5);
 
         //cout<< "Vector size = " << tableOfAgents.size() << endl;
-
-        
-    };
+    }
 
     void interactions()
     {
@@ -169,16 +166,20 @@ public:
             else if(all_of(tableOfAgents.begin(), tableOfAgents.end(), [](int v){ return (v < 0);}))
                 break;
         }
-    };
+    }
+
     void display()
     {
         cout << "=================="<<endl;
         for (auto v : tableOfAgents)
-        {
             cout << v << endl;
+    }
+
+    void saveToFile()
+    {
+        for (auto v : tableOfAgents)
             writeToFileHistogram(Parameters, v);
-        }
-    };
+    }
 
     double countProportionOfBToAll()
     {
@@ -192,7 +193,6 @@ public:
 
         return (double) countB / Parameters->n;
     }
-
 };
 
 class kwadrats
@@ -250,11 +250,12 @@ int main(int argc, char ** argv)
         string simulationType = argv[1];
         if (simulationType == "histogram")
         {
+            cleanHistogramFile(Parameters);
             agents Agents(&Parameters, &RandBin);
             for(int i = 0; i < Parameters.g; i++)
                 Agents.interactions();
 
-            Agents.display();
+            Agents.saveToFile();
         }
         else if (simulationType == "kwadraty")
         {
