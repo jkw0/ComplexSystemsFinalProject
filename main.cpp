@@ -177,12 +177,20 @@ public:
         int nrOfInteractions = 0;
         while(1)
         {
-            for(auto idExt : agentsIdxs)
+            if(Parameters->selfInfluenceMatters == true)
             {
-                for(auto idInt : agentsIdxs)
-                {
-                    tableOfAgents[idExt] += (tableOfAgents[idInt] > 0) ? 1 : -1;
-                }
+                for(auto idExt : agentsIdxs)
+                    for(auto idInt : agentsIdxs)
+                        tableOfAgents[idExt] += (tableOfAgents[idInt] > 0) ? 1 : -1;
+            }
+            else if (Parameters->selfInfluenceMatters == false)
+            {
+                for(auto idExt : agentsIdxs)
+                    for(auto idInt : agentsIdxs)
+                    {
+                        if (idExt == idInt) continue;
+                        tableOfAgents[idExt] += (tableOfAgents[idInt] > 0) ? 1 : -1;
+                    }
             }
             nrOfInteractions++;
             if(nrOfInteractions >= Parameters->M)
