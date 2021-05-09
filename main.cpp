@@ -120,7 +120,8 @@ ofstream createAndOpenFileKwadraty(parameters* params)
     string name = "KWA__M" + to_string(params->M) + "_n" + to_string(params->n) + "_g" + to_string(params->g) + "_s" +
         to_string(params->s) + "_IA" + toStringWithPrecision(params->initial_IA, 1) + "_pA" +
         toStringWithPrecision(params->initial_pA, 1) + "_IB" + toStringWithPrecision(params->IB, 1) + "_pB" +
-        toStringWithPrecision(params->pB, 1) + "_numOfKw" + to_string(params->numOfKwadraciki)  + ".txt";
+        toStringWithPrecision(params->pB, 1) + "_selfInfl" + (params->selfInfluenceMatters ? "true" : "false") +
+        "_numOfKw" + to_string(params->numOfKwadraciki)  + ".txt";
     
     file.open(name, ios::out | ios::app);
 
@@ -133,7 +134,8 @@ void cleanKwadratyFile(parameters params)
     string name = "KWA__M" + to_string(params.M) + "_n" + to_string(params.n) + "_g" + to_string(params.g) + "_s" +
         to_string(params.s) + "_IA" + toStringWithPrecision(params.initial_IA, 1) + "_pA" +
         toStringWithPrecision(params.initial_pA, 1) + "_IB" + toStringWithPrecision(params.IB, 1) + "_pB" +
-        toStringWithPrecision(params.pB, 1) + "_numOfKw" + to_string(params.numOfKwadraciki)  + ".txt";
+        toStringWithPrecision(params.pB, 1) +  "_selfInfl" + (params.selfInfluenceMatters ? "true" : "false") +
+        "_numOfKw" + to_string(params.numOfKwadraciki)  + ".txt";
 
     file.open(name, ios::out);
     file.close();
