@@ -244,6 +244,9 @@ public:
     void liczKwadraciki()
     {
         // auto file = createAndOpenFileKwadraty(Parameters);
+        double progress = 0;
+        int iterationNum = 0;
+        const int numOfIterations = tableDim * tableDim;
         table.resize(tableDim, vector<double>(tableDim));
         for(int i = 0; i < tableDim; i++)
         {
@@ -260,6 +263,9 @@ public:
                 // file << toStringWithPrecision(Parameters->pA, 2) << "  " << toStringWithPrecision(Parameters->IA, 2) << "  " <<
                     // toStringWithPrecision(table[i][j], 2) << "\n";
                 Parameters->pA += 0.01;
+                progress = (double) ++iterationNum/numOfIterations;
+                if (iterationNum % 10 == 0)
+                    cout << "Progress: " << toStringWithPrecision(100*progress,2) << "%" << endl;
             }
             Parameters->IA += 0.05;
         }
@@ -275,10 +281,10 @@ public:
         {
             for(int j = 0; j < 20; j++)
             {
-                cout<< table[i][j] << "\t";
+                // cout<< table[i][j] << "\t";
                 file << toStringWithPrecision(table[i][j], 4) << "\t";
             }
-            cout<<endl;
+            // cout<<endl;
             file << "\n";
         }
         file.close();
