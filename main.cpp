@@ -198,11 +198,17 @@ public:
                     }
             }
             nrOfInteractions++;
+            vector<double> tableOfAgentsSmall;
+            tableOfAgentsSmall.reserve(Parameters->s);
+            for (auto idx : agentsIdxs)
+            {
+                tableOfAgentsSmall.push_back(tableOfAgents[idx]);
+            }
             if(nrOfInteractions >= Parameters->M)
                 break;
-            else if(all_of(tableOfAgents.begin(), tableOfAgents.end(), [](int v){ return (v > 0);}))
+            else if(all_of(tableOfAgentsSmall.begin(), tableOfAgentsSmall.end(), [](double v){return (v < 0);}))
                 break;
-            else if(all_of(tableOfAgents.begin(), tableOfAgents.end(), [](int v){ return (v < 0);}))
+            else if(all_of(tableOfAgentsSmall.begin(), tableOfAgentsSmall.end(), [](double v){ return (v > 0);}))
                 break;
         }
     }
