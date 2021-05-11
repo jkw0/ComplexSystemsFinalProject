@@ -1,2 +1,2 @@
-9 10000 500000 3 0.1 0.3 0.0 1 21
-M n  g         s IA  pA  IB selfInf numOfKw
+5 10000 500000 3 0.0 0.3 0.0 1 0.5 0.01 1.0 0.1
+M n  g         s IA  pA  IB selfInf  initsupEnd initsupStep inflexEnd inflexStep
