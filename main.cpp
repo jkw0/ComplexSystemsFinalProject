@@ -309,7 +309,7 @@ public:
         auto file = createAndOpenFileKwadraty(Parameters);
         for(int i = (inflexiblesDim-1); i >= 0; i--)
         {
-            for(int j = (initialSupportersDim-1); j >=0; j--)
+            for(int j = 0; j < initialSupportersDim; j++)
             {
                 // cout<< table[i][j] << "\t";
                 file << toStringWithPrecision(table[i][j], 3) << "\t";
