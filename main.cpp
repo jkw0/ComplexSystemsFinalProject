@@ -7,6 +7,7 @@
 #include <sstream>
 #include <array>
 #include <cmath>
+#include <random>
 using namespace std;
 
 class parameters
@@ -81,15 +82,22 @@ public:
 class randBin
 {
     const int max_nr;
+    random_device rd;
+    mt19937 gen;
+    uniform_int_distribution<int> dis;
+    int num;
 public:
     randBin(const int _max_nr)
     : max_nr(_max_nr)
     {
-        std::srand(std::time(nullptr));
+        gen = mt19937(rd());
+        dis = uniform_int_distribution<int>(0, max_nr-1); //Parameters->n-1
+        // std::srand(std::time(nullptr));
     }
     int genRandBinNumber()
     {
-        return rand()%max_nr;
+        // return rand()%max_nr;
+        return dis(gen);
     }
     randBin(const randBin&) = delete;
 };
@@ -173,12 +181,12 @@ public:
     {
         Parameters = _Parameters;
         Parameters->pB = 1 - Parameters->pA;
-        // cout << "IA: " << Parameters->IA << endl;
         int nOfInflexiblesA = std::round(Parameters->n * Parameters->IA * Parameters->pA);
         int nOfRacionalA = std::round(Parameters->n * Parameters->pA - nOfInflexiblesA);
         int nOfInflexiblesB = std::round(Parameters->n * Parameters->IB * Parameters->pB);
-        // cout << "he?: " << (int)(Parameters->n * Parameters->pB - nOfInflexiblesB + 0.5) << endl;
         int nOfRacionalB = std::round(Parameters->n * Parameters->pB - nOfInflexiblesB);
+        // cout << "IA: " << Parameters->IA << endl;
+        // cout << "he?: " << (int)(Parameters->n * Parameters->pB - nOfInflexiblesB + 0.5) << endl;
         // cout << "pA: " << Parameters->pA << "  pB: " << Parameters->pB << endl;  
         // cout << nOfInflexiblesA << endl << nOfRacionalA << endl  << nOfInflexiblesB  << endl << nOfRacionalB << endl ;
 
@@ -199,17 +207,34 @@ public:
         vector<int> agentsIdxs;
         for(int i = 0; i<Parameters->s; i++)
         {
-            agentsIdxs.push_back(RandBin->genRandBinNumber());
+            int val1, val2, val3;
+            do {
+                val1 = RandBin->genRandBinNumber();
+                val2 = RandBin->genRandBinNumber();
+                val3 = RandBin->genRandBinNumber();
+            } while (val1 != val2 && val2 != val3 && val1 != val3);
+
+
+            agentsIdxs.push_back(val1);
+            agentsIdxs.push_back(val2);
+            agentsIdxs.push_back(val3);
             //cout<<agentsIdxs.back()<<endl;
         }
         int nrOfInteractions = 0;
         while(1)
         {
+            // int num = 0;
+            // cout << "BEFORE INTERACTIONS:" << endl;
+            // for (auto agents : tableOfAgents)
+            //     cout << num++ << ")" << agents << " ";
+            // cout << endl;
             if(Parameters->selfInfluenceMatters == true)
             {
                 for(auto idExt : agentsIdxs)
                     for(auto idInt : agentsIdxs)
+                    {
                         tableOfAgents[idExt] += (tableOfAgents[idInt] > 0) ? 1 : -1;
+                    }
             }
             else if (Parameters->selfInfluenceMatters == false)
             {
@@ -220,19 +245,36 @@ public:
                         tableOfAgents[idExt] += (tableOfAgents[idInt] > 0) ? 1 : -1;
                     }
             }
+
+            // num = 0;
+            // cout << "AFTER INTERACTIONS:" << endl;
+            // for (auto agents : tableOfAgents)
+            //     cout << num++ << ")" << agents << " ";
+            // cout << endl;
+
             nrOfInteractions++;
+
+            if(nrOfInteractions >= Parameters->M)
+            {
+                // std::cout << "break1" << std::endl;
+                break;
+            }
+
             vector<double> tableOfAgentsSmall;
             tableOfAgentsSmall.reserve(Parameters->s);
             for (auto idx : agentsIdxs)
-            {
                 tableOfAgentsSmall.push_back(tableOfAgents[idx]);
+
+            if(all_of(tableOfAgentsSmall.begin(), tableOfAgentsSmall.end(), [](double v){return (v < 0);}))
+            {
+                // std::cout << "break2" << std::endl;
+                break;
             }
-            if(nrOfInteractions >= Parameters->M)
-                break;
-            else if(all_of(tableOfAgentsSmall.begin(), tableOfAgentsSmall.end(), [](double v){return (v < 0);}))
-                break;
             else if(all_of(tableOfAgentsSmall.begin(), tableOfAgentsSmall.end(), [](double v){ return (v > 0);}))
+            {
+                // std::cout << "break3" << std::endl;
                 break;
+            }
         }
     }
 
@@ -252,15 +294,17 @@ public:
     {
         double proportion;
         int countB = 0;
-
+        int k = 0;
         for(auto agent : tableOfAgents)
         {
+            // cout << k++ << ")" << agent << " ";
             countB += (agent < 0) ? 1 : 0;
         }
-
+        // cout << endl;
         proportion = (double) countB / Parameters->n;
-        if (proportion > 1.0)
-            std::cout << "proportion: " << proportion << "   countB: " << countB << "   n: " << Parameters->n << std::endl;
+        // if (proportion > 1.0)
+        // cout << "PARAMS: pA= " << Parameters->pA << " IA=" << Parameters->IA << endl;
+        // std::cout << "proportion: " << proportion << "   countB: " << countB << "   n: " << Parameters->n << std::endl;
         return proportion;
     }
 };
@@ -280,21 +324,34 @@ public:
         const int numOfIterations = initialSupportersDim * inflexiblesDim;
         table.resize(inflexiblesDim, vector<double>(initialSupportersDim));
         Parameters->IA = Parameters->initial_IA;
+        double sumOfProportion = 0;
+
         for(int i = 0; i < inflexiblesDim; i++)
         {
             Parameters->pA = Parameters->initial_pA;
             for(int j = 0; j < initialSupportersDim; j++)
             {
-                agents Agents(Parameters, RandBin);
-                for(int i = 0; i < Parameters->g; i++)
+                for (int realization = 0; realization < 20; realization++)
                 {
-                    Agents.interactions();
+                    cout << "realization nr " << realization+1 << endl;
+                    agents Agents(Parameters, RandBin);
+                    for(int k = 0; k < Parameters->g; k++)
+                    {
+                        Agents.interactions();
+                        if (k % 5000 == 0)
+                            cout << "Progress: " << toStringWithPrecision(100*((double)k/Parameters->g),2) << "%" << endl;
+                    }
+                    table[i][j] = Agents.countProportionOfBToAll();
+                    sumOfProportion += table[i][j];
                 }
-                table[i][j] = Agents.countProportionOfBToAll();
                 Parameters->pA += Parameters->initsupStep;
                 progress = (double) ++iterationNum/numOfIterations;
+
                 if (iterationNum % 10 == 0)
                     cout << "Progress: " << toStringWithPrecision(100*progress,2) << "%" << endl;
+
+                double average = sumOfProportion / 20;
+                cout << "AVG = " << average << endl;
             }
             Parameters->IA += Parameters->inflexStep;
         }
@@ -330,6 +387,7 @@ int main(int argc, char ** argv)
         randBin RandBin(Parameters.n);
 
         string simulationType = argv[1];
+
         if (simulationType == "histogram")
         {
             cleanHistogramFile(Parameters);

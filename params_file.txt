@@ -1,2 +1,2 @@
-5 10000 500000 3 0.0 0.3 0.0 1 0.5 0.01 1.0 0.1
-M n  g         s IA  pA  IB selfInf  initsupEnd initsupStep inflexEnd inflexStep
+1 10000 500000 3 1.0 0.39 0.0 1 0.39 0.01 1.0 0.1
+M n  g  s IA  pA  IB selfInf  pA_End pA_Step IA_End IA_Step
