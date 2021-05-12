@@ -207,34 +207,17 @@ public:
         vector<int> agentsIdxs;
         for(int i = 0; i<Parameters->s; i++)
         {
-            int val1, val2, val3;
-            do {
-                val1 = RandBin->genRandBinNumber();
-                val2 = RandBin->genRandBinNumber();
-                val3 = RandBin->genRandBinNumber();
-            } while (val1 == val2 && val2 == val3 && val1 == val3);
-
-
-            agentsIdxs.push_back(val1);
-            agentsIdxs.push_back(val2);
-            agentsIdxs.push_back(val3);
+            agentsIdxs.push_back(RandBin->genRandBinNumber());
             //cout<<agentsIdxs.back()<<endl;
         }
         int nrOfInteractions = 0;
         while(1)
         {
-            // int num = 0;
-            // cout << "BEFORE INTERACTIONS:" << endl;
-            // for (auto agents : tableOfAgents)
-            //     cout << num++ << ")" << agents << " ";
-            // cout << endl;
             if(Parameters->selfInfluenceMatters == true)
             {
                 for(auto idExt : agentsIdxs)
                     for(auto idInt : agentsIdxs)
-                    {
                         tableOfAgents[idExt] += (tableOfAgents[idInt] > 0) ? 1 : -1;
-                    }
             }
             else if (Parameters->selfInfluenceMatters == false)
             {
@@ -245,36 +228,19 @@ public:
                         tableOfAgents[idExt] += (tableOfAgents[idInt] > 0) ? 1 : -1;
                     }
             }
-
-            // num = 0;
-            // cout << "AFTER INTERACTIONS:" << endl;
-            // for (auto agents : tableOfAgents)
-            //     cout << num++ << ")" << agents << " ";
-            // cout << endl;
-
             nrOfInteractions++;
-
-            if(nrOfInteractions >= Parameters->M)
-            {
-                // std::cout << "break1" << std::endl;
-                break;
-            }
-
             vector<double> tableOfAgentsSmall;
             tableOfAgentsSmall.reserve(Parameters->s);
             for (auto idx : agentsIdxs)
+            {
                 tableOfAgentsSmall.push_back(tableOfAgents[idx]);
-
-            if(all_of(tableOfAgentsSmall.begin(), tableOfAgentsSmall.end(), [](double v){return (v < 0);}))
-            {
-                // std::cout << "break2" << std::endl;
-                break;
             }
+            if(nrOfInteractions >= Parameters->M)
+                break;
+            else if(all_of(tableOfAgentsSmall.begin(), tableOfAgentsSmall.end(), [](double v){return (v < 0);}))
+                break;
             else if(all_of(tableOfAgentsSmall.begin(), tableOfAgentsSmall.end(), [](double v){ return (v > 0);}))
-            {
-                // std::cout << "break3" << std::endl;
                 break;
-            }
         }
     }
 
