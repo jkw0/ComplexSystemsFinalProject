@@ -212,7 +212,7 @@ public:
                 val1 = RandBin->genRandBinNumber();
                 val2 = RandBin->genRandBinNumber();
                 val3 = RandBin->genRandBinNumber();
-            } while (val1 != val2 && val2 != val3 && val1 != val3);
+            } while (val1 == val2 && val2 == val3 && val1 == val3);
 
 
             agentsIdxs.push_back(val1);
@@ -304,7 +304,7 @@ public:
         proportion = (double) countB / Parameters->n;
         // if (proportion > 1.0)
         // cout << "PARAMS: pA= " << Parameters->pA << " IA=" << Parameters->IA << endl;
-        // std::cout << "proportion: " << proportion << "   countB: " << countB << "   n: " << Parameters->n << std::endl;
+        std::cout << "proportion: " << proportion << "   countB: " << countB << "   n: " << Parameters->n << std::endl;
         return proportion;
     }
 };
@@ -338,8 +338,6 @@ public:
                     for(int k = 0; k < Parameters->g; k++)
                     {
                         Agents.interactions();
-                        if (k % 5000 == 0)
-                            cout << "Progress: " << toStringWithPrecision(100*((double)k/Parameters->g),2) << "%" << endl;
                     }
                     table[i][j] = Agents.countProportionOfBToAll();
                     sumOfProportion += table[i][j];
