@@ -156,8 +156,8 @@ ofstream createAndOpenFileKwadraty(parameters* params)
 class agents
 {
 public:
-    vector<double> tableOfAgents;
-    vector<pair<double,double>> tableOfAgents2;
+    // vector<double> tableOfAgents;
+    vector<pair<double,int>> tableOfAgents; // first=strength of opinion; second=strength of convincing
     parameters *Parameters;
     randBin * RandBin;
 
@@ -172,29 +172,20 @@ public:
         int nOfRacionalB = std::round(Parameters->n * Parameters->pB - nOfInflexiblesB);
 
         for (int i = 0; i < nOfInflexiblesA; i++)
-            tableOfAgents.push_back(50.5);
+            tableOfAgents.push_back(make_pair(50.5,1));
         for (int i = 0; i < nOfRacionalA; i++)
-            tableOfAgents.push_back(0.5);
+            tableOfAgents.push_back(make_pair(0.5,1));
         for (int i = 0; i < nOfInflexiblesB; i++)
-            tableOfAgents.push_back(-50.5);
+            tableOfAgents.push_back(make_pair(-50.5,1));
         for (int i = 0; i < nOfRacionalB; i++)
-            tableOfAgents.push_back(-0.5);
+            tableOfAgents.push_back(make_pair(-0.5,1));
 
-        // for (int i = 0; i < nOfInflexiblesA; i++)
-        //     tableOfAgents2.push_back(make_pair(50.5,0));
-        // for (int i = 0; i < nOfRacionalA; i++)
-        //     tableOfAgents2.push_back(make_pair(0.5,0));
-        // for (int i = 0; i < nOfInflexiblesB; i++)
-        //     tableOfAgents2.push_back(make_pair(-50.5,0));
-        // for (int i = 0; i < nOfRacionalB; i++)
-        //     tableOfAgents2.push_back(make_pair(-0.5,0));
-
-        // if (Parameters->conv > 0)
-        //     for (auto agent: tableOfAgents2) {
-        //         if (RandBin->getRandUniform() < Parameters->conv)
-        //             agent.second = 2;
-        //         else agent.second = 1;
-        //     }
+        if (Parameters->conv > 0) {
+            for (int i = 0; i < tableOfAgents.size(); i++) {
+                if (RandBin->getRandUniform() < Parameters->conv)
+                    tableOfAgents[i].second = 2;
+            }
+        }
     }
 
     void interactions()
@@ -210,10 +201,12 @@ public:
             if(Parameters->selfInfluenceMatters == true)
             {
                 int sum = 0;
-                for(auto idx : agentsIdxs)
-                    sum += (tableOfAgents[idx] > 0) ? 1 : -1;
-                for(auto idx : agentsIdxs)
-                    tableOfAgents[idx] += sum;
+                for(auto idx : agentsIdxs) {
+                    sum += (tableOfAgents[idx].first > 0) ? tableOfAgents[idx].second : (-1)*tableOfAgents[idx].second;
+                }
+                for(auto idx : agentsIdxs) {
+                    tableOfAgents[idx].first += sum;
+                }
             }
             else if (Parameters->selfInfluenceMatters == false)
             {
@@ -221,20 +214,22 @@ public:
                 for(auto idExt : agentsIdxs) {
                     int suma = 0;
                     for(auto idIn : agentsIdxs) {
-                        if(idExt != idIn)
-                            suma += (tableOfAgents[idIn] > 0) ? 1 : -1;
+                        if(idExt != idIn) {
+                            suma += (tableOfAgents[idIn].first > 0) ? tableOfAgents[idIn].second : (-1)*tableOfAgents[idIn].second;
+                        }
                     }
                     hm[idExt] = suma;
                 }
-                for(auto idExt : agentsIdxs)
-                    tableOfAgents[idExt] += hm[idExt];
+                for(auto idExt : agentsIdxs) {
+                    tableOfAgents[idExt].first += hm[idExt];
+                }
             }
             nrOfInteractions++;
             if(nrOfInteractions >= Parameters->M)
                 break;
-            else if(all_of(agentsIdxs.begin(), agentsIdxs.end(), [this](double v){return (tableOfAgents[v] < 0);}))
+            else if(all_of(agentsIdxs.begin(), agentsIdxs.end(), [this](double v){return (tableOfAgents[v].first < 0);}))
                 break;
-            else if(all_of(agentsIdxs.begin(), agentsIdxs.end(), [this](double v){ return (tableOfAgents[v] > 0);}))
+            else if(all_of(agentsIdxs.begin(), agentsIdxs.end(), [this](double v){ return (tableOfAgents[v].first > 0);}))
                 break;
         }
     }
@@ -243,14 +238,14 @@ public:
     {
         cout << "=================="<<endl;
         for (auto v : tableOfAgents)
-            cout << v << endl;
+            cout << v.first << endl;
     }
 
     void saveToFile()
     {
         auto file = createAndOpenFileHistogram(Parameters);
         for (auto v : tableOfAgents)
-            file << v << "\n";
+            file << v.first << "\n";
         file.close();
     }
     double countProportionOfBToAll()
@@ -260,7 +255,7 @@ public:
         int k = 0;
         for(auto agent : tableOfAgents)
         {
-            countB += (agent < 0) ? 1 : 0;
+            countB += (agent.first < 0) ? 1 : 0;
         }
         proportion = (double) countB / Parameters->n;
         return proportion;
