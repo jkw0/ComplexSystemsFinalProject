@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <array>
+#include <utility>
 #include <cmath>
 #include <random>
 #include <unordered_map>
@@ -62,7 +63,7 @@ public:
         file.open("params_file.txt", ifstream::in);
         string M_, n_, g_, s_, IA_, pA_, IB_, selfInfluenceMatters_, pA_End_, pA_Step_, IA_End_, IA_Step_, conv_;
         file >> M_ >> n_ >> g_ >> s_ >> IA_ >> pA_ >> IB_ >> selfInfluenceMatters_ >> pA_End_ >> pA_Step_ >>
-            IA_End_ >> IA_Step_, conv_;
+            IA_End_ >> IA_Step_ >> conv_;
         M = stoi(M_);
         n = stoi(n_);
         g = stoi(g_);
@@ -75,11 +76,11 @@ public:
         pA_Step = stod(pA_Step_);
         IA_End = stod(IA_End_);
         IA_Step = stod(IA_Step_);
+        conv = stod(conv_);
         pB = 1 - pA;
         pA_Begin = pA;
         IA_Begin = IA;
         pB_Begin = pB;
-        conv = stod(conv_);
     }
 };
 
@@ -156,6 +157,7 @@ class agents
 {
 public:
     vector<double> tableOfAgents;
+    vector<pair<double,double>> tableOfAgents2;
     parameters *Parameters;
     randBin * RandBin;
 
@@ -178,8 +180,17 @@ public:
         for (int i = 0; i < nOfRacionalB; i++)
             tableOfAgents.push_back(-0.5);
 
+        // for (int i = 0; i < nOfInflexiblesA; i++)
+        //     tableOfAgents2.push_back(make_pair(50.5,0));
+        // for (int i = 0; i < nOfRacionalA; i++)
+        //     tableOfAgents2.push_back(make_pair(0.5,0));
+        // for (int i = 0; i < nOfInflexiblesB; i++)
+        //     tableOfAgents2.push_back(make_pair(-50.5,0));
+        // for (int i = 0; i < nOfRacionalB; i++)
+        //     tableOfAgents2.push_back(make_pair(-0.5,0));
+
         // if (Parameters->conv > 0)
-        //     for (auto agent: tableOfAgents) {
+        //     for (auto agent: tableOfAgents2) {
         //         if (RandBin->getRandUniform() < Parameters->conv)
         //             agent.second = 2;
         //         else agent.second = 1;
