@@ -329,6 +329,48 @@ public:
     }
 };
 
+class agreementProportion
+{
+public:
+    randBin *RandBin;
+    parameters* Parameters;
+    vector<pair<double,double>> proportionOfFullAgreements;
+
+    agreementProportion(parameters* _Parameters, randBin * _RandBin)
+    :RandBin(_RandBin), Parameters(_Parameters) {}
+
+    void calculateProportion()
+    {
+        int numOfRealizations = 50;
+        int numOfPoints = (Parameters->IA_End-Parameters->IA_Begin)/Parameters->IA_Step + 1;
+        int numOfFullAgreements = 0;
+        Parameters->IA = Parameters->IA_Begin;
+        for (int p = 0; p <= numOfPoints; p++) {
+            cout << "point " << Parameters->IA << " " << (double)100*p/numOfPoints << "%" << endl;
+            for (int realization = 0; realization < numOfRealizations; realization++) {
+                agents Agents(Parameters, RandBin);
+                for (int k = 0; k < Parameters->g; k++) {
+                    Agents.interactions();
+                }
+                numOfFullAgreements += (1-Agents.countProportionOfBToAll());
+                // if ( abs(Agents.countProportionOfBToAll()) < 0.0001 ) {
+                //     numOfFullAgreements++;
+                // }
+            }
+            proportionOfFullAgreements.push_back(make_pair(Parameters->IA, (double)numOfFullAgreements/numOfRealizations));
+            Parameters->IA += Parameters->IA_Step;
+            numOfFullAgreements = 0;
+        }
+    }
+
+    void display()
+    {
+        for (auto p: proportionOfFullAgreements) {
+            cout << p.first << ": " << p.second << endl;
+        }
+    }
+};
+
 int main(int argc, char ** argv)
 {
     if (argc >= 2)
@@ -352,6 +394,12 @@ int main(int argc, char ** argv)
             kwadrats Kwadrats(&Parameters, &RandBin);
             Kwadrats.liczKwadraciki();
             Kwadrats.display();
+        }
+        else if (simulationType == "agreement")
+        {
+            agreementProportion Agreement(&Parameters, &RandBin);
+            Agreement.calculateProportion();
+            Agreement.display();
         }
         else 
         {
