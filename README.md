@@ -14,7 +14,8 @@ należy dać wartość 1 lub 0, które oznaczają tak lub nie.\
 parametry "pA_End pA_Step IA_End IA_Step" używane są do generowania heatmapy, gdzie *_End to koniec zakresu, a *_Step to krok -\
 dzięki temu wygeneruje się heatmapa o poprawnym rozmiarze, dokładnie tak jak w artykule.
 parametr "conv" - odsetek agentów o zdwojonej sile przekonywania, interakcja z takim agentem powoduje osłabienie opinii\
-lub jej umocnienie o dwie jednostki, zamiast o jedną, tak jak byłoby z "normalnym" agentem
+lub jej umocnienie o dwie jednostki, zamiast o jedną, tak jak byłoby z "normalnym" agentem.\
+Ustawienie "conv" na 0.0 przywraca starą symulację ( tj. wszystkie agenty mają wartość 1, czyli po staremu ;-) )
 
 potem wpisujemy do konsoli:\
 ./main.exe kwadraty\
