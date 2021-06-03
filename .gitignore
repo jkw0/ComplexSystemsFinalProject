@@ -1,3 +1,5 @@
 *.txt
 !params_file.txt
 *.exe
+*.png
+*.ipynb
