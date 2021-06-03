@@ -6,13 +6,15 @@ uruchamianie:\
 umieścić w tym samym folderze plik main.cpp oraz params_file.txt\
 najpierw uzupełnić plik "params_file.txt", przykładowo:
 
-1 10000 500000 3 0.4 0.3 0.0 1 0.39 0.01 1.0 0.1
-M n       g    s IA  pA  IB selfInf  pA_End pA_Step IA_End IA_Step
+1 10000 500000 3 0.4 0.3 0.0 1 0.39 0.01 1.0 0.1 0.0
+M n       g    s IA  pA  IB selfInf  pA_End pA_Step IA_End IA_Step conv
 
 parametr "selfInf" oznacza, czy bierzemy pod uwagę opinię własną do obliczania wypadkowej\
 należy dać wartość 1 lub 0, które oznaczają tak lub nie.\
 parametry "pA_End pA_Step IA_End IA_Step" używane są do generowania heatmapy, gdzie *_End to koniec zakresu, a *_Step to krok -\
 dzięki temu wygeneruje się heatmapa o poprawnym rozmiarze, dokładnie tak jak w artykule.
+parametr "conv" - odsetek agentów o zdwojonej sile przekonywania, interakcja z takim agentem powoduje osłabienie opinii\
+lub jej umocnienie o dwie jednostki, zamiast o jedną, tak jak byłoby z "normalnym" agentem
 
 potem wpisujemy do konsoli:\
 ./main.exe kwadraty\
