@@ -156,7 +156,6 @@ ofstream createAndOpenFileKwadraty(parameters* params)
 class agents
 {
 public:
-    // vector<double> tableOfAgents;
     vector<pair<double,int>> tableOfAgents; // first=strength of opinion; second=strength of convincing
     parameters *Parameters;
     randBin * RandBin;
@@ -210,19 +209,25 @@ public:
             }
             else if (Parameters->selfInfluenceMatters == false)
             {
+                // cout << "B: " << agentsIdxs[0] << ": " << tableOfAgents[agentsIdxs[0]].first << ", " << agentsIdxs[1] << ": " << tableOfAgents[agentsIdxs[1]].first << ", " << 
+                //     agentsIdxs[2] << ": " << tableOfAgents[agentsIdxs[2]].first << endl;
+
                 unordered_map<int, double> hm;
                 for(auto idExt : agentsIdxs) {
-                    int suma = 0;
+                    int sum = 0;
                     for(auto idIn : agentsIdxs) {
                         if(idExt != idIn) {
-                            suma += (tableOfAgents[idIn].first > 0) ? tableOfAgents[idIn].second : (-1)*tableOfAgents[idIn].second;
+                            sum += (tableOfAgents[idIn].first > 0) ? tableOfAgents[idIn].second : (-1)*tableOfAgents[idIn].second;
                         }
                     }
-                    hm[idExt] = suma;
+                    hm[idExt] = sum;
                 }
                 for(auto idExt : agentsIdxs) {
                     tableOfAgents[idExt].first += hm[idExt];
                 }
+
+                // cout << "A: " << agentsIdxs[0] << ": " << tableOfAgents[agentsIdxs[0]].first << ", " << agentsIdxs[1] << ": " << tableOfAgents[agentsIdxs[1]].first << ", " << 
+                //     agentsIdxs[2] << ": " << tableOfAgents[agentsIdxs[2]].first << endl << endl;
             }
             nrOfInteractions++;
             if(nrOfInteractions >= Parameters->M)
