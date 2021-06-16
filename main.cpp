@@ -265,6 +265,19 @@ public:
         proportion = (double) countB / Parameters->n;
         return proportion;
     }
+    double countProportionOfAToAll()
+    {
+        double proportion;
+        int countA = 0;
+        int k = 0;
+        for(auto agent : tableOfAgents)
+        {
+            countA += (agent.first > 0) ? 1 : 0;
+        }
+
+        proportion = (double) countA / Parameters->n;
+        return proportion;
+    }
 };
 
 class kwadrats
@@ -357,12 +370,15 @@ public:
                 for (int k = 0; k < Parameters->g; k++) {
                     Agents.interactions();
                 }
-                numOfFullAgreements += (1-Agents.countProportionOfBToAll());
-                // if ( abs(Agents.countProportionOfBToAll()) < 0.0001 ) {
-                //     numOfFullAgreements++;
-                // }
+                // numOfFullAgreements += (1-Agents.countProportionOfBToAll());
+                // cout << realization << ". proportion of A = " << Agents.countProportionOfAToAll() << endl;
+                if ( Agents.countProportionOfAToAll() > 0.999 ) {
+                    numOfFullAgreements++;
+                }
             }
-            proportionOfFullAgreements.push_back(make_pair(Parameters->IA, (double)numOfFullAgreements/numOfRealizations));
+            double proportion = (double)numOfFullAgreements/numOfRealizations;
+            // cout << "numOfAgreements = " << numOfFullAgreements << ", numOfRealizations = " << numOfRealizations  << ", proportion = " << proportion << endl;
+            proportionOfFullAgreements.push_back(make_pair(Parameters->IA, proportion));
             Parameters->IA += Parameters->IA_Step;
             numOfFullAgreements = 0;
         }
